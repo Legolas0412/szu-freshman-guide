@@ -107,7 +107,7 @@ export default function HomePage() {
               <div className="guide-title"><Icon size={22} strokeWidth={1.7} /><div><span>{category.english}</span><h3>{category.title}</h3></div></div>
               <p>{category.description}</p>
               <div className="topic-list">{category.items.map((item) => <div className="topic-entry" key={item.id}>
-                <button className="topic-open" onClick={() => openGuide(item)}><span><strong>{item.title}</strong><small>{item.summary}</small></span><em>已核实</em><ArrowRight size={16} /></button>
+                <button className="topic-open" onClick={() => openGuide(item)}><span><strong>{item.title}</strong><small>{item.summary}</small></span><ArrowRight size={16} /></button>
                 <button className={`favorite-button ${favorites.includes(item.id) ? 'is-saved' : ''}`} onClick={() => toggleFavorite(item.id)} aria-pressed={favorites.includes(item.id)} aria-label={`${favorites.includes(item.id) ? '取消收藏' : '收藏'}${item.title}`}>
                   {favorites.includes(item.id) ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
                 </button>
@@ -150,7 +150,6 @@ export default function HomePage() {
         <DialogContent className="guide-dialog">
           {selectedGuide && <>
             <DialogHeader className="guide-dialog-head">
-              <span>VERIFIED GUIDE</span>
               <DialogTitle>{selectedGuide.title}</DialogTitle>
               <DialogDescription>{selectedGuide.summary}</DialogDescription>
               <button className={`dialog-favorite ${favorites.includes(selectedGuide.id) ? 'is-saved' : ''}`} onClick={() => toggleFavorite(selectedGuide.id)} aria-pressed={favorites.includes(selectedGuide.id)}>
