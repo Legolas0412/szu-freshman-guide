@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'SZTU 新生攻略｜深圳技术大学新生指南',
-  description: '面向深圳技术大学新生的校园生活与入学攻略导航。',
+  title: 'SZU 新生攻略｜深圳大学新生指南',
+  description: '面向深圳大学新生的入学、学习与校园生活攻略框架。',
 };
 
 export default function RootLayout({
