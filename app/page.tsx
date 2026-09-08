@@ -90,8 +90,12 @@ export default function HomePage() {
             <div className="quick-tags">{quickTags.map((tag) => <button key={tag} onClick={() => setQuery(tag)}>{tag}</button>)}</div>
           </div>
 
-          <div className="hero-emblem" aria-label="深圳大学校徽与校训">
-            <div className="emblem-orbit"><div className="official-emblem" role="img" aria-label="深圳大学校徽" /></div>
+          <div className="hero-emblem" aria-label="深圳大学与校训">
+            <div className="university-wordmark">
+              <strong>SZU</strong>
+              <span>深圳大学</span>
+              <small>SHENZHEN UNIVERSITY</small>
+            </div>
             <div className="motto-block"><span>校训</span><strong>自立 · 自律 · 自强</strong><small>INDEPENDENCE · SELF-DISCIPLINE · SELF-IMPROVEMENT</small></div>
           </div>
           <button className="scroll-cue" onClick={() => scrollTo('guides')}>开始探索 <ArrowDown size={17} /></button>
