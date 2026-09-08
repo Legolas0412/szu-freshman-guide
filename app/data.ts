@@ -5,6 +5,7 @@ export type GuideItem = {
 export type GuideCategory = { id: string; title: string; english: string; icon: string; description: string; items: GuideItem[] };
 
 const guide = (item: GuideItem) => item;
+const publicAsset = (fileName: string) => `${import.meta.env.BASE_URL}${fileName}`;
 
 export const categories: GuideCategory[] = [
   { id:'arrival', title:'入学报到', english:'ARRIVAL', icon:'Flag', description:'从录取后的第一份材料，到报到当天顺利入住。', items:[
@@ -207,6 +208,6 @@ export const categories: GuideCategory[] = [
 ];
 
 export const campusMaps = [
-  { id:'yuehai', title:'粤海校区', address:'南山区南海大道 3688 号', image:'/szu-map-1.jpg', detail:'含粤海、沧海、南校区及西丽校区', landmarks:['汇典楼（北馆）','汇智楼（南馆）','汇元楼','致理楼','元平体育馆','听荔餐厅','南区宿舍','立德门'] },
-  { id:'lihu', title:'丽湖校区', address:'南山区学苑大道 1066 号', image:'/szu-map-3.jpg', detail:'教学、宿舍、餐饮与公共服务一图定位', landmarks:['四方楼（教学楼）','启明楼（图书馆）','守正楼（服务大厅）','守慧楼','至快体育馆','采葛餐厅','风信子宿舍','惟品门'] },
+  { id:'yuehai', title:'粤海校区', address:'南山区南海大道 3688 号', image:publicAsset('szu-map-1.jpg'), detail:'含粤海、沧海、南校区及西丽校区', landmarks:['汇典楼（北馆）','汇智楼（南馆）','汇元楼','致理楼','元平体育馆','听荔餐厅','南区宿舍','立德门'] },
+  { id:'lihu', title:'丽湖校区', address:'南山区学苑大道 1066 号', image:publicAsset('szu-map-3.jpg'), detail:'教学、宿舍、餐饮与公共服务一图定位', landmarks:['四方楼（教学楼）','启明楼（图书馆）','守正楼（服务大厅）','守慧楼','至快体育馆','采葛餐厅','风信子宿舍','惟品门'] },
 ];
