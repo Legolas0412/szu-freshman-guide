@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
-import { ArrowDown, ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, Clock3, Coffee, ExternalLink, Flag, Gamepad2, Heart, Home, Map, Maximize2, Search, ShieldCheck, TrainFront, UsersRound, Wifi, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, Clock3, Coffee, ExternalLink, Eye, Flag, Gamepad2, Heart, Home, Map, Maximize2, Search, ShieldCheck, TrainFront, UsersRound, Wifi, X } from 'lucide-react';
 import { categories, campusMaps, type GuideItem } from './data';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
@@ -109,6 +109,11 @@ export default function HomePage() {
 
   return (
     <main>
+      <aside className="visit-counter" aria-label="网站访问次数">
+        <Eye size={12} aria-hidden="true" />
+        <span>访问</span>
+        <strong id="busuanzi_site_pv">—</strong>
+      </aside>
       <header className="site-header">
         <div className="shell nav-shell">
           <button className="brand" onClick={() => scrollTo('home')} aria-label="返回首页">
