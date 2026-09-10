@@ -178,7 +178,7 @@ export default function HomePage() {
       {sideQuestCategory && <section className="side-quest-section" id="side-quests">
         <div className="shell side-quest-shell">
           <div className="side-quest-heading" data-reveal>
-            <div><span><Gamepad2 size={18} /> SIDE QUESTS</span><h2>主线之外，<br />打开新的可能。</h2></div>
+            <div><span><Gamepad2 size={18} /> SIDE QUESTS</span><h2>新的可能</h2></div>
             <p>绩点是基础，大学也远不止绩点。选择一条感兴趣的支线，从科研、竞赛与长期发展中积累属于自己的能力和作品。</p>
           </div>
           <div className="side-quest-grid">
