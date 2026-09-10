@@ -234,7 +234,7 @@ export default function HomePage() {
             </DialogHeader>
             <div className="guide-detail">
               <ol>{selectedGuide.steps.map((step, index) => <li key={step}><b>{String(index + 1).padStart(2, '0')}</b><p>{step}</p></li>)}</ol>
-              {selectedGuide.note && <aside><strong>请注意</strong><p>{selectedGuide.note}</p></aside>}
+              {selectedGuide.note && !/(面向 2026 级普通本科新生|每学期的具体选课时间与规则会变化)/.test(selectedGuide.note) && <aside><strong>请注意</strong><p>{selectedGuide.note}</p></aside>}
               {selectedGuide.contact && <div className="contact-row"><span>咨询方式</span><strong>{selectedGuide.contact}</strong></div>}
               {selectedGuide.networkRequired && <div className="network-notice"><Wifi size={16} /><span><strong>校内入口</strong> 若无法打开，请连接校园网或学校提供的远程访问环境。</span></div>}
               {sideQuestCategory?.items.some((item) => item.id === selectedGuide.id)
