@@ -38,19 +38,34 @@ export default function HomePage() {
 
   useEffect(() => {
     const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal], [data-scroll-animation]'));
-    if (!('IntersectionObserver' in window)) {
-      elements.forEach((element) => element.classList.add('is-visible'));
-      return;
-    }
+    let frame = 0;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        entry.target.classList.toggle('is-visible', entry.isIntersecting);
+    const updateVisibility = () => {
+      frame = 0;
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const enterLine = viewportHeight * .9;
+      const leaveLine = viewportHeight * .08;
+      elements.forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        element.classList.toggle('is-visible', rect.top < enterLine && rect.bottom > leaveLine);
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    };
 
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(updateVisibility);
+    };
+
+    updateVisibility();
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('touchmove', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+    return () => {
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('touchmove', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   const storeIds = (key: string, ids: string[]) => {
