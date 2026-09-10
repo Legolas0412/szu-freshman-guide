@@ -21,9 +21,12 @@ button:active { transform:scale(.975); transition-duration:90ms!important; }
 .site-header nav button:hover { color:var(--red); }
 .site-header nav i { min-width:17px; height:17px; margin-left:3px; padding:0 5px; display:inline-grid; place-items:center; border-radius:999px; background:#f1dce3; color:var(--red); font-size:9px; font-style:normal; font-variant-numeric:tabular-nums; }
 .nav-note { justify-self:end; color:#85858a; font-size:9px; letter-spacing:.1em; }
-.visit-counter { position:fixed; z-index:29; top:74px; right:16px; width:27px; height:27px; display:grid; place-items:center; border:1px solid rgba(162,11,58,.1); border-radius:50%; background:rgba(255,255,255,.78); box-shadow:0 8px 24px rgba(54,30,39,.08); backdrop-filter:blur(16px) saturate(150%); pointer-events:none; }
+.visit-counter { position:fixed; z-index:29; top:74px; right:16px; width:27px; height:27px; padding:0; display:flex; align-items:center; justify-content:center; gap:0; overflow:hidden; border:1px solid rgba(162,11,58,.1); border-radius:999px; background:rgba(255,255,255,.78); box-shadow:0 8px 24px rgba(54,30,39,.08); backdrop-filter:blur(16px) saturate(150%); cursor:pointer; transition:width .32s var(--ease),gap .32s var(--ease),background .2s ease; }
+.visit-counter:hover { background:rgba(255,255,255,.94); }
+.visit-counter.is-expanded { width:66px; gap:6px; }
 .visit-counter svg { color:var(--red); }
-.visit-counter-value { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.visit-counter-value { width:0; overflow:hidden; color:#404044; font-size:10px; font-weight:650; font-variant-numeric:tabular-nums; opacity:0; white-space:nowrap; transition:width .32s var(--ease),opacity .2s ease; }
+.visit-counter.is-expanded .visit-counter-value { width:27px; opacity:1; }
 
 .hero { min-height:860px; overflow:hidden; background:linear-gradient(105deg,rgba(251,251,253,.92) 0%,rgba(251,251,253,.80) 48%,rgba(248,241,244,.76) 100%),url('./assets/szu-desktop-hero.webp') center 44%/cover no-repeat; }
 .hero-shell { position:relative; min-height:860px; padding-top:64px; display:grid; grid-template-columns:1.05fr .95fr; align-items:center; gap:5vw; }

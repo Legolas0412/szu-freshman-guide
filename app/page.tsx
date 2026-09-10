@@ -10,6 +10,7 @@ const quickTags = ['报到', '宿舍', '校园地图', '选课', '校园网'];
 
 export default function HomePage() {
   const [query, setQuery] = useState('');
+  const [showVisitCount, setShowVisitCount] = useState(false);
   const [selectedGuide, setSelectedGuide] = useState<GuideItem | null>(null);
   const [isClosingGuide, setIsClosingGuide] = useState(false);
   const [guideExit, setGuideExit] = useState({ x: 0, y: 0, scale: .18 });
@@ -34,6 +35,22 @@ export default function HomePage() {
     };
     setFavorites(readIds('szu-guide-favorites'));
     setRecent(readIds('szu-guide-recent'));
+  }, []);
+
+  useEffect(() => {
+    const value = document.getElementById('busuanzi_site_pv');
+    if (!value) return;
+    const applyStartingCount = () => {
+      const raw = value.textContent?.trim() || '';
+      if (!/^\d+$/.test(raw) || value.dataset.adjustedFor === raw) return;
+      const adjusted = String(Number(raw) + 188);
+      value.dataset.adjustedFor = adjusted;
+      value.textContent = adjusted;
+    };
+    const observer = new MutationObserver(applyStartingCount);
+    observer.observe(value, { childList: true, characterData: true, subtree: true });
+    applyStartingCount();
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -109,10 +126,10 @@ export default function HomePage() {
 
   return (
     <main>
-      <aside className="visit-counter" aria-label="网站访问次数">
+      <button className={`visit-counter${showVisitCount ? ' is-expanded' : ''}`} type="button" aria-label={showVisitCount ? '隐藏网站访问次数' : '显示网站访问次数'} aria-expanded={showVisitCount} onClick={() => setShowVisitCount((shown) => !shown)}>
         <Eye size={12} aria-hidden="true" />
         <span id="busuanzi_site_pv" className="visit-counter-value">—</span>
-      </aside>
+      </button>
       <header className="site-header">
         <div className="shell nav-shell">
           <button className="brand" onClick={() => scrollTo('home')} aria-label="返回首页">
