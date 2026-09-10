@@ -34,6 +34,25 @@ export default function HomePage() {
     setRecent(readIds('szu-guide-recent'));
   }, []);
 
+  useEffect(() => {
+    const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+    if (!('IntersectionObserver' in window)) {
+      elements.forEach((element) => element.classList.add('is-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
   const storeIds = (key: string, ids: string[]) => {
     try { localStorage.setItem(key, JSON.stringify(ids)); } catch { /* The feature still works for this visit when storage is unavailable. */ }
   };
@@ -105,11 +124,11 @@ export default function HomePage() {
       </section>
 
       <section className="guide-section shell" id="guides">
-        <div className="section-heading"><h2>大学生活，<br />从这八件事展开。</h2><p>依据深圳大学 2026 级入学须知与校内职能部门公开信息整理。打开任一主题即可查看步骤与官方来源。</p></div>
+        <div className="section-heading" data-reveal><h2>大学生活，<br />从这八件事展开。</h2><p>依据深圳大学 2026 级入学须知与校内职能部门公开信息整理。打开任一主题即可查看步骤与官方来源。</p></div>
         <div className="guide-index">
           {mainCategories.map((category) => {
             const Icon = iconMap[category.icon as keyof typeof iconMap];
-            return <article key={category.id} id={category.title} className="guide-row">
+            return <article key={category.id} id={category.title} className="guide-row" data-reveal>
               <div className="guide-title"><Icon size={22} strokeWidth={1.7} /><div><span>{category.english}</span><h3>{category.title}</h3></div></div>
               <p>{category.description}</p>
               <div className="topic-list">{category.items.map((item) => <div className="topic-entry" key={item.id}>
@@ -125,12 +144,12 @@ export default function HomePage() {
 
       {sideQuestCategory && <section className="side-quest-section" id="side-quests">
         <div className="shell side-quest-shell">
-          <div className="side-quest-heading">
+          <div className="side-quest-heading" data-reveal>
             <div><span><Gamepad2 size={18} /> SIDE QUESTS</span><h2>主线之外，<br />打开新的可能。</h2></div>
             <p>绩点是基础，大学也远不止绩点。选择一条感兴趣的支线，从科研、竞赛与长期发展中积累属于自己的能力和作品。</p>
           </div>
           <div className="side-quest-grid">
-            {sideQuestCategory.items.map((item, index) => <article className="side-quest-card" key={item.id}>
+            {sideQuestCategory.items.map((item, index) => <article className="side-quest-card" data-reveal key={item.id}>
               <div className="side-quest-card-head"><span>{String(index + 1).padStart(2, '0')}</span><button className={`side-quest-favorite ${favorites.includes(item.id) ? 'is-saved' : ''}`} onClick={() => toggleFavorite(item.id)} aria-pressed={favorites.includes(item.id)} aria-label={`${favorites.includes(item.id) ? '取消收藏' : '收藏'}${item.title}`}>{favorites.includes(item.id) ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}</button></div>
               <button className="side-quest-open" onClick={() => openGuide(item)}>
                 <div><h3>{item.title}</h3><p>{item.summary}</p></div>
@@ -143,7 +162,7 @@ export default function HomePage() {
 
       <section className="saved-section" id="saved">
         <div className="shell">
-          <div className="saved-heading"><h2>留住重要的，<br />接着上次继续。</h2><p>收藏会保存在当前浏览器；打开过的攻略自动进入最近浏览，最多保留六项。</p></div>
+          <div className="saved-heading" data-reveal><h2>留住重要的，<br />接着上次继续。</h2><p>收藏会保存在当前浏览器；打开过的攻略自动进入最近浏览，最多保留六项。</p></div>
           <div className="saved-grid">
             <SavedPanel title="我的收藏" icon={<Heart size={19} />} ids={favorites} items={allItems} empty="还没有收藏。点击攻略右侧的书签，把重要内容留在这里。" openGuide={openGuide} />
             <SavedPanel title="最近浏览" icon={<Clock3 size={19} />} ids={recent} items={allItems} empty="你打开过的攻略会自动记录在这里。" openGuide={openGuide} />
@@ -153,8 +172,8 @@ export default function HomePage() {
 
       <section className="map-section" id="campus-maps">
         <div className="shell">
-          <div className="map-heading"><h2>两个校区，<br />先找到你的方向。</h2><p>官方平面地图已经标注教学楼、宿舍、食堂、校门、小巴站与公共服务设施。点击地图可查看高清原图。</p></div>
-          <div className="map-grid">{campusMaps.map((campus) => <article className="campus-map" key={campus.id}>
+          <div className="map-heading" data-reveal><h2>两个校区，<br />先找到你的方向。</h2><p>官方平面地图已经标注教学楼、宿舍、食堂、校门、小巴站与公共服务设施。点击地图可查看高清原图。</p></div>
+          <div className="map-grid">{campusMaps.map((campus) => <article className="campus-map" data-reveal key={campus.id}>
             <button type="button" onClick={() => setSelectedMap(campus)} className="map-image" aria-label={`查看${campus.title}高清地图`}><img src={campus.image} alt={`${campus.title}官方平面地图`} /><span><Maximize2 size={16} /> 查看高清地图</span></button>
             <div className="map-info"><div><span>{campus.address}</span><h3>{campus.title}</h3><p>{campus.detail}</p></div><ul>{campus.landmarks.map((place) => <li key={place}>{place}</li>)}</ul></div>
           </article>)}</div>
