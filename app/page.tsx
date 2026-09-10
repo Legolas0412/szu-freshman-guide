@@ -14,6 +14,8 @@ export default function HomePage() {
   const [selectedMap, setSelectedMap] = useState<(typeof campusMaps)[number] | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [recent, setRecent] = useState<string[]>([]);
+  const mainCategories = useMemo(() => categories.filter((category) => category.id !== 'side-quests'), []);
+  const sideQuestCategory = useMemo(() => categories.find((category) => category.id === 'side-quests'), []);
   const allItems = useMemo(() => categories.flatMap((category) => category.items.map((item) => ({ ...item, category: category.title }))), []);
   const results = useMemo(() => {
     const key = query.trim().toLowerCase();
@@ -105,7 +107,7 @@ export default function HomePage() {
       <section className="guide-section shell" id="guides">
         <div className="section-heading"><h2>大学生活，<br />从这八件事展开。</h2><p>依据深圳大学 2026 级入学须知与校内职能部门公开信息整理。打开任一主题即可查看步骤与官方来源。</p></div>
         <div className="guide-index">
-          {categories.map((category) => {
+          {mainCategories.map((category) => {
             const Icon = iconMap[category.icon as keyof typeof iconMap];
             return <article key={category.id} id={category.title} className="guide-row">
               <div className="guide-title"><Icon size={22} strokeWidth={1.7} /><div><span>{category.english}</span><h3>{category.title}</h3></div></div>
@@ -120,6 +122,24 @@ export default function HomePage() {
           })}
         </div>
       </section>
+
+      {sideQuestCategory && <section className="side-quest-section" id="side-quests">
+        <div className="shell side-quest-shell">
+          <div className="side-quest-heading">
+            <div><span><Gamepad2 size={18} /> SIDE QUESTS</span><h2>主线之外，<br />打开新的可能。</h2></div>
+            <p>绩点是基础，大学也远不止绩点。选择一条感兴趣的支线，从科研、竞赛与长期发展中积累属于自己的能力和作品。</p>
+          </div>
+          <div className="side-quest-grid">
+            {sideQuestCategory.items.map((item, index) => <article className="side-quest-card" key={item.id}>
+              <div className="side-quest-card-head"><span>{String(index + 1).padStart(2, '0')}</span><button className={`side-quest-favorite ${favorites.includes(item.id) ? 'is-saved' : ''}`} onClick={() => toggleFavorite(item.id)} aria-pressed={favorites.includes(item.id)} aria-label={`${favorites.includes(item.id) ? '取消收藏' : '收藏'}${item.title}`}>{favorites.includes(item.id) ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}</button></div>
+              <button className="side-quest-open" onClick={() => openGuide(item)}>
+                <div><h3>{item.title}</h3><p>{item.summary}</p></div>
+                <div className="side-quest-card-foot"><span>{item.tags.slice(0, 3).join(' · ')}</span><ArrowRight size={18} /></div>
+              </button>
+            </article>)}
+          </div>
+        </div>
+      </section>}
 
       <section className="saved-section" id="saved">
         <div className="shell">
@@ -184,6 +204,7 @@ export default function HomePage() {
       <nav className="mobile-nav" aria-label="移动端导航">
         <button onClick={() => scrollTo('home')}><Home size={18} />首页</button>
         <button onClick={() => scrollTo('guides')}><BookOpen size={18} />攻略</button>
+        <button onClick={() => scrollTo('side-quests')}><Gamepad2 size={18} />副本</button>
         <button onClick={() => scrollTo('saved')}><Heart size={18} />收藏{favorites.length ? <i>{favorites.length}</i> : null}</button>
         <button onClick={() => scrollTo('campus-maps')}><Map size={18} />地图</button>
       </nav>
