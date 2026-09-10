@@ -237,7 +237,9 @@ export default function HomePage() {
               {selectedGuide.note && <aside><strong>请注意</strong><p>{selectedGuide.note}</p></aside>}
               {selectedGuide.contact && <div className="contact-row"><span>咨询方式</span><strong>{selectedGuide.contact}</strong></div>}
               {selectedGuide.networkRequired && <div className="network-notice"><Wifi size={16} /><span><strong>校内入口</strong> 若无法打开，请连接校园网或学校提供的远程访问环境。</span></div>}
-              <a href={selectedGuide.href} target="_blank" rel="noopener noreferrer" className="source-link"><span><strong>了解详情</strong><small>{selectedGuide.sourceLabel}</small></span><ExternalLink size={15} /></a>
+              {sideQuestCategory?.items.some((item) => item.id === selectedGuide.id)
+                ? <div className="more-info"><p>想了解更多信息？点击下方按钮即可查看完整攻略与相关资源。</p><a href={selectedGuide.href} target="_blank" rel="noopener noreferrer" className="source-link"><span><strong>查看更多信息</strong><small>{selectedGuide.sourceLabel}</small></span><ExternalLink size={15} /></a></div>
+                : <a href={selectedGuide.href} target="_blank" rel="noopener noreferrer" className="source-link source-link-compact">{selectedGuide.sourceLabel}<ExternalLink size={15} /></a>}
             </div>
           </>}
         </DialogContent>
