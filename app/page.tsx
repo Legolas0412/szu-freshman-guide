@@ -37,7 +37,7 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+    const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal], [data-scroll-animation]'));
     if (!('IntersectionObserver' in window)) {
       elements.forEach((element) => element.classList.add('is-visible'));
       return;
@@ -45,9 +45,7 @@ export default function HomePage() {
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
+        entry.target.classList.toggle('is-visible', entry.isIntersecting);
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
@@ -114,10 +112,10 @@ export default function HomePage() {
       <section className="hero" id="home">
         <div className="shell hero-shell">
           <div className="hero-copy">
-            <p className="hero-overline">写给每一位即将走进荔园的新同学</p>
-            <h1>从陌生，<br />到喜欢上这里。</h1>
-            <p className="hero-lead">一份简洁、可靠、持续更新的深圳大学新生指南。先从你现在最需要知道的事开始。</p>
-            <div className="search-wrap">
+            <p className="hero-overline" data-scroll-animation>写给每一位即将走进荔园的新同学</p>
+            <h1 data-scroll-animation>从陌生，<br />到喜欢上这里。</h1>
+            <p className="hero-lead" data-scroll-animation>一份简洁、可靠、持续更新的深圳大学新生指南。先从你现在最需要知道的事开始。</p>
+            <div className="search-wrap" data-scroll-animation>
               <div className="search-box">
                 <Search size={20} aria-hidden="true" />
                 <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索报到、宿舍、选课…" aria-label="搜索新生攻略" />
@@ -128,16 +126,16 @@ export default function HomePage() {
                 {results.slice(0, 6).map((item) => <button key={item.id} onClick={() => { openGuide(item); setQuery(''); }}><span><strong>{item.title}</strong><small>{item.category} · {item.summary}</small></span><ArrowRight size={16} /></button>)}
               </div>}
             </div>
-            <div className="quick-tags">{quickTags.map((tag) => <button key={tag} onClick={() => setQuery(tag)}>{tag}</button>)}</div>
+            <div className="quick-tags" data-scroll-animation>{quickTags.map((tag) => <button key={tag} onClick={() => setQuery(tag)}>{tag}</button>)}</div>
           </div>
 
           <div className="hero-emblem" aria-label="深圳大学与校训">
             <div className="university-wordmark">
-              <strong>SZU</strong>
-              <span>深圳大学</span>
-              <small>SHENZHEN UNIVERSITY</small>
+              <strong data-scroll-animation>SZU</strong>
+              <span data-scroll-animation>深圳大学</span>
+              <small data-scroll-animation>SHENZHEN UNIVERSITY</small>
             </div>
-            <div className="motto-block"><span>校训</span><strong>自立 · 自律 · 自强</strong><small>INDEPENDENCE · SELF-DISCIPLINE · SELF-IMPROVEMENT</small></div>
+            <div className="motto-block" data-scroll-animation><span>校训</span><strong>自立 · 自律 · 自强</strong><small>INDEPENDENCE · SELF-DISCIPLINE · SELF-IMPROVEMENT</small></div>
           </div>
           <button className="scroll-cue" onClick={() => scrollTo('guides')}>开始探索 <ArrowDown size={17} /></button>
         </div>
