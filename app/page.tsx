@@ -237,7 +237,7 @@ export default function HomePage() {
               {selectedGuide.note && <aside><strong>请注意</strong><p>{selectedGuide.note}</p></aside>}
               {selectedGuide.contact && <div className="contact-row"><span>咨询方式</span><strong>{selectedGuide.contact}</strong></div>}
               {selectedGuide.networkRequired && <div className="network-notice"><Wifi size={16} /><span><strong>校内入口</strong> 若无法打开，请连接校园网或学校提供的远程访问环境。</span></div>}
-              <a href={selectedGuide.href} target="_blank" rel="noopener noreferrer" className="source-link">{selectedGuide.sourceLabel}<ExternalLink size={15} /></a>
+              <a href={selectedGuide.href} target="_blank" rel="noopener noreferrer" className="source-link"><span><strong>了解详情</strong><small>{selectedGuide.sourceLabel}</small></span><ExternalLink size={15} /></a>
             </div>
           </>}
         </DialogContent>
