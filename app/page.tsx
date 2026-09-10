@@ -91,7 +91,7 @@ export default function HomePage() {
     window.setTimeout(() => {
       setSelectedGuide(null);
       setIsClosingGuide(false);
-    }, 460);
+    }, 330);
   };
 
   return (
