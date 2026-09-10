@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, Clock3, Coffee, ExternalLink, Flag, Gamepad2, Heart, Home, Map, Maximize2, Search, ShieldCheck, TrainFront, UsersRound, Wifi, X } from 'lucide-react';
 import { categories, campusMaps, type GuideItem } from './data';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -11,6 +11,8 @@ const quickTags = ['报到', '宿舍', '校园地图', '选课', '校园网'];
 export default function HomePage() {
   const [query, setQuery] = useState('');
   const [selectedGuide, setSelectedGuide] = useState<GuideItem | null>(null);
+  const [isClosingGuide, setIsClosingGuide] = useState(false);
+  const [guideExit, setGuideExit] = useState({ x: 0, y: 0, scale: .18 });
   const [selectedMap, setSelectedMap] = useState<(typeof campusMaps)[number] | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [recent, setRecent] = useState<string[]>([]);
@@ -65,13 +67,31 @@ export default function HomePage() {
     });
   };
 
-  const openGuide = (item: GuideItem) => {
+  const openGuide = (item: GuideItem, source?: HTMLElement) => {
+    if (source) {
+      const rect = source.getBoundingClientRect();
+      setGuideExit({
+        x: rect.left + rect.width / 2 - window.innerWidth / 2,
+        y: rect.top + rect.height / 2 - window.innerHeight / 2,
+        scale: Math.max(.12, Math.min(.28, rect.width / Math.min(760, window.innerWidth - 32))),
+      });
+    }
+    setIsClosingGuide(false);
     setRecent((current) => {
       const next = [item.id, ...current.filter((id) => id !== item.id)].slice(0, 6);
       storeIds('szu-guide-recent', next);
       return next;
     });
     setSelectedGuide(item);
+  };
+
+  const closeGuide = () => {
+    if (!selectedGuide || isClosingGuide) return;
+    setIsClosingGuide(true);
+    window.setTimeout(() => {
+      setSelectedGuide(null);
+      setIsClosingGuide(false);
+    }, 460);
   };
 
   return (
@@ -132,7 +152,7 @@ export default function HomePage() {
               <div className="guide-title"><Icon size={22} strokeWidth={1.7} /><div><span>{category.english}</span><h3>{category.title}</h3></div></div>
               <p>{category.description}</p>
               <div className="topic-list">{category.items.map((item) => <div className="topic-entry" key={item.id}>
-                <button className="topic-open" onClick={() => openGuide(item)}><span><strong>{item.title}</strong><small>{item.summary}</small></span><ArrowRight size={16} /></button>
+                <button className="topic-open" onClick={(event) => openGuide(item, event.currentTarget)}><span><strong>{item.title}</strong><small>{item.summary}</small></span><ArrowRight size={16} /></button>
                 <button className={`favorite-button ${favorites.includes(item.id) ? 'is-saved' : ''}`} onClick={() => toggleFavorite(item.id)} aria-pressed={favorites.includes(item.id)} aria-label={`${favorites.includes(item.id) ? '取消收藏' : '收藏'}${item.title}`}>
                   {favorites.includes(item.id) ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
                 </button>
@@ -151,7 +171,7 @@ export default function HomePage() {
           <div className="side-quest-grid">
             {sideQuestCategory.items.map((item, index) => <article className="side-quest-card" data-reveal key={item.id}>
               <div className="side-quest-card-head"><span>{String(index + 1).padStart(2, '0')}</span><button className={`side-quest-favorite ${favorites.includes(item.id) ? 'is-saved' : ''}`} onClick={() => toggleFavorite(item.id)} aria-pressed={favorites.includes(item.id)} aria-label={`${favorites.includes(item.id) ? '取消收藏' : '收藏'}${item.title}`}>{favorites.includes(item.id) ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}</button></div>
-              <button className="side-quest-open" onClick={() => openGuide(item)}>
+              <button className="side-quest-open" onClick={(event) => openGuide(item, event.currentTarget)}>
                 <div><h3>{item.title}</h3><p>{item.summary}</p></div>
                 <div className="side-quest-card-foot"><span>{item.tags.slice(0, 3).join(' · ')}</span><ArrowRight size={18} /></div>
               </button>
@@ -189,8 +209,8 @@ export default function HomePage() {
         <div className="footer-bottom shell"><span>SZU FRESHMAN GUIDE</span><span>MADE FOR NEW BEGINNINGS</span></div>
       </footer>
 
-      <Dialog open={Boolean(selectedGuide)} onOpenChange={(open) => !open && setSelectedGuide(null)}>
-        <DialogContent className="guide-dialog">
+      <Dialog open={Boolean(selectedGuide)} onOpenChange={(open) => !open && closeGuide()}>
+        <DialogContent className={`guide-dialog ${isClosingGuide ? 'is-closing' : ''}`} style={{ '--exit-x': `${guideExit.x}px`, '--exit-y': `${guideExit.y}px`, '--exit-scale': guideExit.scale } as CSSProperties}>
           {selectedGuide && <>
             <DialogHeader className="guide-dialog-head">
               <DialogTitle>{selectedGuide.title}</DialogTitle>
