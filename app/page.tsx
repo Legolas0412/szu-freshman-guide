@@ -111,8 +111,7 @@ export default function HomePage() {
     <main>
       <aside className="visit-counter" aria-label="网站访问次数">
         <Eye size={12} aria-hidden="true" />
-        <span>访问</span>
-        <strong id="busuanzi_site_pv">—</strong>
+        <span id="busuanzi_site_pv" className="visit-counter-value">—</span>
       </aside>
       <header className="site-header">
         <div className="shell nav-shell">
