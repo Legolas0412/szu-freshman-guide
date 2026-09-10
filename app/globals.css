@@ -184,14 +184,14 @@ body:has(.guide-dialog.is-closing) [data-slot="dialog-overlay"] { will-change:op
 .university-wordmark span.is-visible { animation:hero-rise .77s .77s var(--ease) both; }
 .university-wordmark small.is-visible,.motto-block.is-visible { animation:hero-rise .77s .9s var(--ease) both; }
 
-[data-reveal] { opacity:0; transform:translateY(28px); transition:opacity .825s var(--ease),transform .935s var(--ease); }
+[data-reveal] { opacity:0; transform:translateY(28px); transition:opacity .908s var(--ease),transform 1.029s var(--ease); }
 [data-reveal].is-visible { opacity:1; transform:none; }
 .guide-row .topic-entry { opacity:0; transform:translateX(-24px); }
-.guide-row.is-visible .topic-entry { animation:list-slide .715s var(--ease) both; }
-.guide-row.is-visible .topic-entry:nth-child(2) { animation-delay:.08s; }
-.guide-row.is-visible .topic-entry:nth-child(3) { animation-delay:.15s; }
-.guide-row.is-visible .topic-entry:nth-child(4) { animation-delay:.23s; }
-.guide-row.is-visible .topic-entry:nth-child(5) { animation-delay:.31s; }
+.guide-row.is-visible .topic-entry { animation:list-slide .787s var(--ease) both; }
+.guide-row.is-visible .topic-entry:nth-child(2) { animation-delay:.088s; }
+.guide-row.is-visible .topic-entry:nth-child(3) { animation-delay:.165s; }
+.guide-row.is-visible .topic-entry:nth-child(4) { animation-delay:.253s; }
+.guide-row.is-visible .topic-entry:nth-child(5) { animation-delay:.341s; }
 .side-quest-card:nth-child(2),.campus-map:nth-child(2) { transition-delay:.08s; }
 .side-quest-card:nth-child(3) { transition-delay:.16s; }
 .side-quest-card:nth-child(4) { transition-delay:.24s; }
