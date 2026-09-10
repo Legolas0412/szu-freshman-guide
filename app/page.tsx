@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { ArrowDown, ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, Clock3, Coffee, ExternalLink, Flag, Heart, Home, Map, Maximize2, Search, ShieldCheck, TrainFront, UsersRound, Wifi, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, Clock3, Coffee, ExternalLink, Flag, Gamepad2, Heart, Home, Map, Maximize2, Search, ShieldCheck, TrainFront, UsersRound, Wifi, X } from 'lucide-react';
 import { categories, campusMaps, type GuideItem } from './data';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-const iconMap = { Flag, Map, BookOpen, Wifi, TrainFront, Coffee, UsersRound, ShieldCheck };
+const iconMap = { Flag, Map, BookOpen, Wifi, TrainFront, Coffee, UsersRound, ShieldCheck, Gamepad2 };
 const quickTags = ['报到', '宿舍', '校园地图', '选课', '校园网'];
 
 export default function HomePage() {
