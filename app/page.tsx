@@ -53,6 +53,22 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    const value = document.getElementById('busuanzi_site_pv');
+    if (!value) return;
+    const applyStartingCount = () => {
+      const raw = value.textContent?.trim() || '';
+      if (!/^\d+$/.test(raw) || value.dataset.adjustedFor === raw) return;
+      const adjusted = String(Number(raw) + 745);
+      value.dataset.adjustedFor = adjusted;
+      value.textContent = adjusted;
+    };
+    const observer = new MutationObserver(applyStartingCount);
+    observer.observe(value, { childList: true, characterData: true, subtree: true });
+    applyStartingCount();
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal], [data-scroll-animation]'));
     let frame = 0;
 
@@ -156,7 +172,7 @@ export default function HomePage() {
     <main>
       <button className={`visit-counter${showVisitCount ? ' is-expanded' : ''}`} type="button" aria-label={showVisitCount ? '隐藏网站访问次数' : '显示网站访问次数'} aria-expanded={showVisitCount} onClick={() => setShowVisitCount((shown) => !shown)}>
         <Eye size={12} aria-hidden="true" />
-        <span className="visit-counter-value">1085</span>
+        <span id="busuanzi_site_pv" className="visit-counter-value">—</span>
       </button>
       <header className="site-header">
         <div className="shell nav-shell">
