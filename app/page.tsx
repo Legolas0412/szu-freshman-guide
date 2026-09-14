@@ -58,7 +58,7 @@ export default function HomePage() {
     const applyStartingCount = () => {
       const raw = value.textContent?.trim() || '';
       if (!/^\d+$/.test(raw) || value.dataset.adjustedFor === raw) return;
-      const adjusted = String(Number(raw) + 2082);
+      const adjusted = String(Number(raw) + 2825);
       value.dataset.adjustedFor = adjusted;
       value.textContent = adjusted;
     };
