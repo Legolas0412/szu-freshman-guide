@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
-import { ArrowDown, ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, Clock3, Coffee, ExternalLink, Eye, Flag, Gamepad2, Heart, Home, Map, Maximize2, Search, ShieldCheck, TrainFront, UsersRound, Wifi, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, BookOpen, Bookmark, BookmarkCheck, Clock3, Coffee, Crown, Dumbbell, ExternalLink, Eye, Flag, Gamepad2, Heart, Home, Map, MapPin, Maximize2, Search, ShieldCheck, Sparkles, TrainFront, UsersRound, Utensils, Wifi, X } from 'lucide-react';
 import { categories, campusMaps, type GuideItem } from './data';
+import { merchantSamples, type MerchantSample } from './plant-data';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const iconMap = { Flag, Map, BookOpen, Wifi, TrainFront, Coffee, UsersRound, ShieldCheck, Gamepad2 };
@@ -11,6 +12,12 @@ const quickTags = ['报到', '宿舍', '校园地图', '选课', '校园网'];
 export default function HomePage() {
   const [query, setQuery] = useState('');
   const [showVisitCount, setShowVisitCount] = useState(false);
+  const [showPlantPage, setShowPlantPage] = useState(false);
+  const [plantCategory, setPlantCategory] = useState<'餐饮' | '运动娱乐' | '书香'>('运动娱乐');
+  const [selectedMerchant, setSelectedMerchant] = useState<MerchantSample | null>(null);
+  const [previewMerchant, setPreviewMerchant] = useState<{ merchant: MerchantSample; slide: number } | null>(null);
+  const [isClosingMerchant, setIsClosingMerchant] = useState(false);
+  const [merchantExit, setMerchantExit] = useState({ x: 0, y: 0, scale: .18 });
   const [selectedGuide, setSelectedGuide] = useState<GuideItem | null>(null);
   const [isClosingGuide, setIsClosingGuide] = useState(false);
   const [guideExit, setGuideExit] = useState({ x: 0, y: 0, scale: .18 });
@@ -20,11 +27,19 @@ export default function HomePage() {
   const mainCategories = useMemo(() => categories.filter((category) => category.id !== 'side-quests'), []);
   const sideQuestCategory = useMemo(() => categories.find((category) => category.id === 'side-quests'), []);
   const allItems = useMemo(() => categories.flatMap((category) => category.items.map((item) => ({ ...item, category: category.title }))), []);
+  const savedItems = useMemo<SavedEntry[]>(() => [
+    ...allItems.map((item) => ({ id: item.id, title: item.title, summary: item.summary, category: item.category, kind: 'guide' as const, guide: item })),
+    ...merchantSamples.map((merchant) => ({ id: merchant.id, title: merchant.name, summary: merchant.summary, category: `种草 · ${merchant.category}`, kind: 'merchant' as const, merchant })),
+  ], [allItems]);
   const results = useMemo(() => {
     const key = query.trim().toLowerCase();
     return key ? allItems.filter((item) => [item.title, item.summary, item.category, ...item.tags].join(' ').toLowerCase().includes(key)) : [];
   }, [allItems, query]);
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  const openPlantPage = () => {
+    setShowPlantPage(true);
+    window.requestAnimationFrame(() => document.querySelector<HTMLElement>('.plant-experience')?.focus());
+  };
 
   useEffect(() => {
     const readIds = (key: string) => {
@@ -35,22 +50,6 @@ export default function HomePage() {
     };
     setFavorites(readIds('szu-guide-favorites'));
     setRecent(readIds('szu-guide-recent'));
-  }, []);
-
-  useEffect(() => {
-    const value = document.getElementById('busuanzi_site_pv');
-    if (!value) return;
-    const applyStartingCount = () => {
-      const raw = value.textContent?.trim() || '';
-      if (!/^\d+$/.test(raw) || value.dataset.adjustedFor === raw) return;
-      const adjusted = String(Number(raw) + 188);
-      value.dataset.adjustedFor = adjusted;
-      value.textContent = adjusted;
-    };
-    const observer = new MutationObserver(applyStartingCount);
-    observer.observe(value, { childList: true, characterData: true, subtree: true });
-    applyStartingCount();
-    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -124,11 +123,40 @@ export default function HomePage() {
     }, 330);
   };
 
+  const openMerchant = (merchant: MerchantSample, source?: HTMLElement) => {
+    const rect = source?.getBoundingClientRect();
+    setMerchantExit({
+      x: rect ? rect.left + rect.width / 2 - window.innerWidth / 2 : 0,
+      y: rect ? rect.top + rect.height / 2 - window.innerHeight / 2 : 0,
+      scale: rect ? Math.max(.12, Math.min(.3, rect.width / Math.min(720, window.innerWidth - 32))) : .9,
+    });
+    setIsClosingMerchant(false);
+    setSelectedMerchant(merchant);
+  };
+
+  const closeMerchant = () => {
+    if (!selectedMerchant || isClosingMerchant) return;
+    setIsClosingMerchant(true);
+    window.setTimeout(() => {
+      setSelectedMerchant(null);
+      setIsClosingMerchant(false);
+    }, 330);
+  };
+
+  const openSavedItem = (entry: SavedEntry, source: HTMLElement) => {
+    if (entry.kind === 'guide') openGuide(entry.guide, source);
+    else {
+      setShowPlantPage(true);
+      setPlantCategory(entry.merchant.category);
+      openMerchant(entry.merchant, source);
+    }
+  };
+
   return (
     <main>
       <button className={`visit-counter${showVisitCount ? ' is-expanded' : ''}`} type="button" aria-label={showVisitCount ? '隐藏网站访问次数' : '显示网站访问次数'} aria-expanded={showVisitCount} onClick={() => setShowVisitCount((shown) => !shown)}>
         <Eye size={12} aria-hidden="true" />
-        <span id="busuanzi_site_pv" className="visit-counter-value">—</span>
+        <span className="visit-counter-value">1085</span>
       </button>
       <header className="site-header">
         <div className="shell nav-shell">
@@ -138,6 +166,7 @@ export default function HomePage() {
           </button>
           <nav aria-label="主导航">
             <button onClick={() => scrollTo('guides')}>新生攻略</button>
+            <button onClick={openPlantPage}>种草</button>
             <button onClick={() => scrollTo('campus-maps')}>校园地图</button>
             <button onClick={() => scrollTo('saved')}>收藏 <i>{favorites.length}</i></button>
           </nav>
@@ -214,12 +243,26 @@ export default function HomePage() {
         </div>
       </section>}
 
+      <section className="plant-preview-section" id="plant" data-reveal>
+        <button type="button" className="shell plant-preview" onClick={openPlantPage}>
+          <div className="plant-preview-copy">
+            <span><Sparkles size={17} /> CAMPUS PICKS</span>
+            <h2>种草</h2>
+            <p>发现校园附近值得停留的餐饮、运动与阅读空间。</p>
+          </div>
+          <div className="plant-preview-images" aria-hidden="true">
+            {merchantSamples.map((merchant) => <img key={merchant.id} className={merchant.previewImage ? 'is-logo' : ''} src={merchant.previewImage ?? merchant.image} alt="" />)}
+          </div>
+          <span className="plant-preview-action">打开种草 <ArrowRight size={18} /></span>
+        </button>
+      </section>
+
       <section className="saved-section" id="saved">
         <div className="shell">
           <div className="saved-heading" data-reveal><h2>留住重要的，<br />接着上次继续。</h2><p>收藏会保存在当前浏览器；打开过的攻略自动进入最近浏览，最多保留六项。</p></div>
           <div className="saved-grid">
-            <SavedPanel title="我的收藏" icon={<Heart size={19} />} ids={favorites} items={allItems} empty="还没有收藏。点击攻略右侧的书签，把重要内容留在这里。" openGuide={openGuide} />
-            <SavedPanel title="最近浏览" icon={<Clock3 size={19} />} ids={recent} items={allItems} empty="你打开过的攻略会自动记录在这里。" openGuide={openGuide} />
+            <SavedPanel title="我的收藏" icon={<Heart size={19} />} ids={favorites} items={savedItems} empty="还没有收藏。点击攻略或店铺旁的书签，把重要内容留在这里。" openItem={openSavedItem} />
+            <SavedPanel title="最近浏览" icon={<Clock3 size={19} />} ids={recent} items={savedItems} empty="你打开过的攻略会自动记录在这里。" openItem={openSavedItem} />
           </div>
         </div>
       </section>
@@ -276,10 +319,71 @@ export default function HomePage() {
         </DialogContent>
       </Dialog>
 
+      {showPlantPage && <section className="plant-experience" tabIndex={-1} aria-label="种草商家推荐">
+        <header className="plant-page-header">
+          <button type="button" onClick={() => setShowPlantPage(false)}><ArrowLeft size={17} />返回首页</button>
+          <span><Sparkles size={15} /> 校友种草</span>
+        </header>
+        <div className="shell plant-page-shell">
+          <nav className="plant-category-tabs" aria-label="种草分类">
+            <button type="button" className={plantCategory === '运动娱乐' ? 'is-active' : ''} onClick={() => setPlantCategory('运动娱乐')}><Dumbbell size={16} />运动娱乐</button>
+            <button type="button" className={plantCategory === '餐饮' ? 'is-active' : ''} onClick={() => setPlantCategory('餐饮')}><Utensils size={16} />餐饮</button>
+            <button type="button" className={plantCategory === '书香' ? 'is-active' : ''} onClick={() => setPlantCategory('书香')}><BookOpen size={16} />书香</button>
+          </nav>
+          <div className="plant-page-hero">
+            <span>CAMPUS PICKS · LOCAL SAMPLE</span>
+            <h1>在校园附近，<br />发现新的日常。</h1>
+            <p>从一顿舒服的饭、一次轻松的训练，到一段安静的阅读时光。这里收录适合同学们体验的校园周边空间。</p>
+          </div>
+          {(() => {
+            const merchant = merchantSamples.find((item) => item.category === plantCategory)!;
+            const CategoryIcon = plantCategory === '餐饮' ? Utensils : plantCategory === '书香' ? BookOpen : Dumbbell;
+            const categoryEnglish = plantCategory === '餐饮' ? 'FOOD & DRINK' : plantCategory === '书香' ? 'BOOKS & STUDY' : 'SPORT & PLAY';
+            return <section className="plant-category" key={plantCategory}>
+              <div className="plant-category-heading"><CategoryIcon size={20} /><div><span>{categoryEnglish}</span><h2>{plantCategory}</h2></div></div>
+              <div className="merchant-grid"><article className="merchant-card is-pinned" key={merchant.id}>
+                <MerchantCardGallery merchant={merchant} pinned onPreview={(slide) => setPreviewMerchant({ merchant, slide })} />
+                <button type="button" className={`merchant-favorite ${favorites.includes(merchant.id) ? 'is-saved' : ''}`} onClick={() => toggleFavorite(merchant.id)} aria-pressed={favorites.includes(merchant.id)} aria-label={`${favorites.includes(merchant.id) ? '取消收藏' : '收藏'}${merchant.name}`}>{favorites.includes(merchant.id) ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}</button>
+                <div className="merchant-content">
+                  <span>{merchant.english}{merchant.isSample === false ? '' : ' · 展示样例'}</span>
+                  <h3>{merchant.name}</h3>
+                  <p>{merchant.summary}</p>
+                  <div className="merchant-scenes">{merchant.scenes.map((scene) => <span key={scene}>{scene}</span>)}</div>
+                  <dl><div><dt><MapPin size={14} />位置</dt><dd>{merchant.address}</dd></div><div><dt><Clock3 size={14} />营业时间</dt><dd>{merchant.hours}</dd></div></dl>
+                  <button type="button" onClick={(event) => openMerchant(merchant, event.currentTarget)}>了解详情 <ArrowRight size={17} /></button>
+                </div>
+              </article></div>
+            </section>;
+          })()}
+        </div>
+      </section>}
+
+      <Dialog open={Boolean(selectedMerchant)} onOpenChange={(open) => !open && closeMerchant()}>
+        <DialogContent className={`merchant-dialog ${isClosingMerchant ? 'is-closing' : ''}`} style={{ '--exit-x': `${merchantExit.x}px`, '--exit-y': `${merchantExit.y}px`, '--exit-scale': merchantExit.scale } as CSSProperties}>
+          {selectedMerchant && <>
+            <MerchantGallery key={selectedMerchant.id} merchant={selectedMerchant} onBack={closeMerchant} onPreview={(slide) => setPreviewMerchant({ merchant: selectedMerchant, slide })} />
+            {selectedMerchant.featured && selectedMerchant.video && <section className="merchant-video" aria-label="门店视频"><div><span>STORE VIDEO</span><strong>门店视频</strong></div><video controls preload="metadata" playsInline poster={selectedMerchant.image} src={selectedMerchant.video}>你的浏览器暂不支持视频播放。</video></section>}
+            <DialogHeader className="merchant-dialog-head"><span>{selectedMerchant.english}</span><DialogTitle>{selectedMerchant.name}</DialogTitle><DialogDescription>{selectedMerchant.summary}</DialogDescription></DialogHeader>
+            <div className="merchant-dialog-body">
+              <button type="button" className={`merchant-dialog-favorite ${favorites.includes(selectedMerchant.id) ? 'is-saved' : ''}`} onClick={() => toggleFavorite(selectedMerchant.id)} aria-pressed={favorites.includes(selectedMerchant.id)}>{favorites.includes(selectedMerchant.id) ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}{favorites.includes(selectedMerchant.id) ? '已收藏' : '收藏店铺'}</button>
+              {selectedMerchant.details.map((detail) => <p key={detail}>{detail}</p>)}
+              <dl><div><dt>位置</dt><dd>{selectedMerchant.address}</dd></div><div><dt>营业时间</dt><dd>{selectedMerchant.hours}</dd></div>{selectedMerchant.phones?.length && <div><dt>咨询电话</dt><dd className="merchant-phone-list">{selectedMerchant.phones.map((phone) => <a href={`tel:${phone}`} key={phone}>{phone}</a>)}</dd></div>}</dl>
+            </div>
+          </>}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(previewMerchant)} onOpenChange={(open) => !open && setPreviewMerchant(null)}>
+        <DialogContent className="merchant-image-dialog" showCloseButton={false}>
+          {previewMerchant && <><DialogTitle className="sr-only">{previewMerchant.merchant.name}图片</DialogTitle>{merchantSlides(previewMerchant.merchant)[previewMerchant.slide] ? <img src={merchantSlides(previewMerchant.merchant)[previewMerchant.slide]!.src} alt={merchantSlides(previewMerchant.merchant)[previewMerchant.slide]!.alt} /> : <div className="merchant-image-dialog-placeholder" aria-label={`商家图片占位 ${previewMerchant.slide + 1}`} />}<button type="button" onClick={() => setPreviewMerchant(null)} aria-label="关闭大图"><X size={20} /></button></>}
+        </DialogContent>
+      </Dialog>
+
       <nav className="mobile-nav" aria-label="移动端导航">
         <button onClick={() => scrollTo('home')}><Home size={18} />首页</button>
         <button onClick={() => scrollTo('guides')}><BookOpen size={18} />攻略</button>
         <button onClick={() => scrollTo('side-quests')}><Gamepad2 size={18} />副本</button>
+        <button onClick={openPlantPage}><Sparkles size={18} />种草</button>
         <button onClick={() => scrollTo('saved')}><Heart size={18} />收藏{favorites.length ? <i>{favorites.length}</i> : null}</button>
         <button onClick={() => scrollTo('campus-maps')}><Map size={18} />地图</button>
       </nav>
@@ -287,12 +391,66 @@ export default function HomePage() {
   );
 }
 
-type SavedItem = GuideItem & { category: string };
+type SavedEntry =
+  | { id: string; title: string; summary: string; category: string; kind: 'guide'; guide: GuideItem }
+  | { id: string; title: string; summary: string; category: string; kind: 'merchant'; merchant: MerchantSample };
 
-function SavedPanel({ title, icon, ids, items, empty, openGuide }: { title: string; icon: ReactNode; ids: string[]; items: SavedItem[]; empty: string; openGuide: (item: GuideItem) => void }) {
-  const visible = ids.map((id) => items.find((item) => item.id === id)).filter(Boolean) as SavedItem[];
+function MerchantGallery({ merchant, onBack, onPreview }: { merchant: MerchantSample; onBack: () => void; onPreview: (slide: number) => void }) {
+  const [slide, setSlide] = useState(0);
+  const slides = merchantSlides(merchant);
+  useEffect(() => {
+    const timer = window.setInterval(() => setSlide((current) => (current + 1) % slides.length), 4000);
+    return () => window.clearInterval(timer);
+  }, [slides.length]);
+
+  return <div className="merchant-dialog-gallery">
+    <div className="merchant-dialog-track" style={{ transform: `translateX(-${slide * 100}%)` }}>
+      {slides.map((image, index) => image
+        ? <button type="button" className="merchant-dialog-slide merchant-dialog-image-open" key={image.src} onClick={() => onPreview(index)} aria-label={`放大查看${merchant.name}第 ${index + 1} 张图片`}><img src={image.src} alt={image.alt} /></button>
+        : <div className="merchant-dialog-slide merchant-dialog-placeholder" key={`placeholder-${index}`} aria-label={`商家图片占位 ${index + 1}`} />)}
+    </div>
+    <button type="button" className="merchant-dialog-back" onClick={onBack}><ArrowLeft size={16} />返回攻略</button>
+    <span className="merchant-dialog-badge">{merchant.featured ? '校友推荐 TOP 1' : `校友种草${merchant.isSample === false ? '' : ' · 展示样例'}`}</span>
+    <div className="merchant-gallery-dots" aria-label="商家图片轮播">
+      {slides.map((_, index) => <button key={index} type="button" className={slide === index ? 'is-active' : ''} onClick={() => setSlide(index)} aria-label={`查看第 ${index + 1} 张图片`} aria-current={slide === index ? 'true' : undefined} />)}
+    </div>
+  </div>;
+}
+
+function MerchantCardGallery({ merchant, pinned, onPreview }: { merchant: MerchantSample; pinned: boolean; onPreview: (slide: number) => void }) {
+  const [slide, setSlide] = useState(0);
+  const slides = merchantSlides(merchant);
+  useEffect(() => {
+    const timer = window.setInterval(() => setSlide((current) => (current + 1) % slides.length), 4000);
+    return () => window.clearInterval(timer);
+  }, [slides.length]);
+
+  return <div className="merchant-image">
+    <button type="button" className="merchant-card-image-open" onClick={() => onPreview(slide)} aria-label={`放大查看${merchant.name}第 ${slide + 1} 张图片`}>
+      <span className="merchant-card-image-track" style={{ transform: `translateX(-${slide * 100}%)` }}>
+        {slides.map((image, index) => image
+          ? <span className="merchant-card-image-slide" key={image.src}><img src={image.src} alt={image.alt} /></span>
+          : <span className="merchant-card-image-slide merchant-dialog-placeholder" key={`placeholder-${index}`} />)}
+      </span>
+    </button>
+    <span className="merchant-card-badge">{pinned ? '校友推荐 TOP 1' : '校友种草'}</span>
+    {pinned && <strong className="merchant-crown" aria-label="置顶店铺"><Crown size={22} /></strong>}
+    <div className="merchant-card-dots" aria-hidden="true">{slides.map((_, index) => <i key={index} className={slide === index ? 'is-active' : ''} />)}</div>
+  </div>;
+}
+
+function merchantSlides(merchant: MerchantSample): ({ src: string; alt: string } | null)[] {
+  return merchant.galleryImages ?? [
+    { src: merchant.image, alt: merchant.imageAlt },
+    null,
+    null,
+  ];
+}
+
+function SavedPanel({ title, icon, ids, items, empty, openItem }: { title: string; icon: ReactNode; ids: string[]; items: SavedEntry[]; empty: string; openItem: (item: SavedEntry, source: HTMLElement) => void }) {
+  const visible = ids.map((id) => items.find((item) => item.id === id)).filter(Boolean) as SavedEntry[];
   return <section className="saved-panel">
     <div className="saved-panel-head"><span>{icon}{title}</span><b>{String(visible.length).padStart(2, '0')}</b></div>
-    {visible.length ? <div className="saved-items">{visible.map((item) => <button key={item.id} onClick={() => openGuide(item)}><span><strong>{item.title}</strong><small>{item.category} · {item.summary}</small></span><ArrowRight size={16} /></button>)}</div> : <div className="saved-empty"><Bookmark size={23} /><p>{empty}</p></div>}
+    {visible.length ? <div className="saved-items">{visible.map((item) => <button key={item.id} onClick={(event) => openItem(item, event.currentTarget)}><span><strong>{item.title}</strong><small>{item.category} · {item.summary}</small></span><ArrowRight size={16} /></button>)}</div> : <div className="saved-empty"><Bookmark size={23} /><p>{empty}</p></div>}
   </section>;
 }
